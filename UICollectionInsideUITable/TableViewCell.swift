@@ -7,92 +7,55 @@
 
 import UIKit
 import Alamofire
+protocol CollectionViewCellDelegate: class {
+    func collectionView(collectionviewcell: CollectionViewCell?, index: Int, didTappedInTableViewCell: TableViewCell)
+   
+}
 class TableViewCell: UITableViewCell {
-    let imageBaseUrl = "https://image.tmdb.org/t/p/w300"
-    let apiKey = "dfa1447aa22cc51e7d90fd37215329fe"
-    let baseUrl = "https://api.themoviedb.org/3/"
-    let defaultImage = "https://www.abprojeyonetimi.com/wp-content/uploads/2018/03/Movie-Night.jpg"
+    static var sender : Result?
+    weak var cellDelegate: CollectionViewCellDelegate?
     var popularMovies = [[Result?]]()
-    //var releaseDateMovies : [Result]? = []
-    //var revenueMovies : [Result]? = []
-    //var primaryReleaseDateMovies : [Result]? = []
-    //var orginalTitleMovies : [Result]? = []
-    //var voteAverageMovies : [Result]? = []
-    //var voteCountMovies : [Result]? = []
-    var movieViewModel = MovieListModell()
-    let sortValue = ["popularity.desc","release_date.desc","revenue.desc", "primary_release_date.desc"]
+   
     
+    var row = 0
     @IBOutlet weak var collectionView: UICollectionView!
     override func awakeFromNib() {
         super.awakeFromNib()
         if popularMovies.isEmpty{
-            for item in sortValue{
-                self.getMovieList(sort: item,movieViewModel: movieViewModel  ,completionHandler: { [self] (res) in
-                    
-                    movieViewModel = res
-                   
-                 })
+            for item in Constants.sortValue{
+                self.getMovieList(sort: item)
              }
+            collectionView.reloadData()
         }
      
        collectionView.delegate = self
         collectionView.dataSource = self
-  
-      
-      
+
     }
-    
-  
-   
-    func getMovieList(sort:String,movieViewModel:MovieListModell,  completionHandler: @escaping (MovieListModell) -> ()) {
+
+    func getMovieList(sort:String) {
        
-            let url = self.baseUrl + "discover/movie"
-            let params = [ "api_key":self.apiKey, "language":"en-US" ,"sort_by": sort,"include_adult":"false","include_video":"true","page":"1"]
+            let url = Constants.baseUrl + "discover/movie"
+        let params = [ "api_key":Constants.apiKey, "language":"en-US" ,"sort_by": sort,"include_adult":"false","include_video":"true","page":"1"]
         AF.request(url,method:.get,parameters:params).responseJSON{  res in
                   if (res.response?.statusCode == 200){
                     let movieList = try? JSONDecoder().decode(MovieList.self, from: res.data!)
                     
                     self.popularMovies.append((movieList?.results!)!)
-                /*  switch sort {
-                    case "popularity.desc":
-                        self.movieViewModel.popularMovies = movieList?.results
-                        //self.popularMovies=movieList?.results
-                    case "release_date.desc":
-                        self.movieViewModel.releaseDateMovies = movieList?.results
-                        self.releaseDateMovies = movieList?.results
-                    case "revenue.desc":
-                        self.movieViewModel.revenueMovies = movieList?.results
-                        //self.revenueMovies = movieList?.results
-                    case "primary_release_date.desc":
-                        self.movieViewModel.primaryReleaseDateMovies = movieList?.results
-                      //  self.primaryReleaseDateMovies = movieList?.results
-                    case "original_title.desc":
-                        self.movieViewModel.orginalTitleMovies = movieList?.results
-                       // self.orginalTitleMovies = movieList?.results
-                    case "vote_average.desc":
-                        self.movieViewModel.voteAverageMovies = movieList?.results
-                      //  self.voteAverageMovies = movieList?.results
-                    case "vote_count.desc":
-                        self.movieViewModel.voteCountMovies = movieList?.results
-                    //    self.voteCountMovies = movieList?.results
-                    default:
-                        print("hata")
-                    }*/
+                
                     
-                    completionHandler(movieViewModel)
                   }
         }
     }
    
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
+      
     }
    
-  
+
     func configure()  {
-        collectionView.reloadData()
+      
        collectionView.scrollToItem(at: IndexPath(item: 1, section: 0), at: .left, animated: false)
         let flowLayout = UICollectionViewFlowLayout()
      
@@ -109,27 +72,28 @@ class TableViewCell: UITableViewCell {
 
 }
 
-
-
 extension TableViewCell : UICollectionViewDelegate ,UICollectionViewDataSource{
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return 20
     }
+    
+  
   
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "big", for: indexPath) as! CollectionViewCell
-        
+        row = indexPath.item
+        print("\(indexPath.row)  \(collectionView.tag) \(indexPath.item)")
         if !(popularMovies.isEmpty){
-            var item = popularMovies[collectionView.tag][indexPath.row % 20]
-            
+            let item = popularMovies[collectionView.tag][indexPath.item]
+        
             cell.image.contentMode = .scaleAspectFit
             cell.title.text = item?.title
-            cell.descriptionLabel.text = (String(describing: item?.voteAverage!))
+            cell.descriptionLabel.text = (String((item?.voteAverage!)!))
            // cell.configure(with:(item))
             if  item?.posterPath != nil {
-                cell.image.load(urlString: (imageBaseUrl + ((item?.posterPath)!)) )
+                cell.image.load(urlString: (Constants.imageBaseUrl + ((item?.posterPath)!)) )
             }else{
-                cell.image.load(urlString: defaultImage)
+                cell.image.load(urlString: Constants.defaultImage)
             }
           
         }
@@ -141,7 +105,7 @@ extension TableViewCell : UICollectionViewDelegate ,UICollectionViewDataSource{
           
           switch pageInt {
           case 0:
-              collectionView.scrollToItem(at: [0, 0], at: .right, animated: false)
+              collectionView.scrollToItem(at: [16, 0], at: .right, animated: false)
           case 16:
               collectionView.scrollToItem(at: [0, 0], at: .left, animated: false)
           default:
@@ -149,44 +113,24 @@ extension TableViewCell : UICollectionViewDelegate ,UICollectionViewDataSource{
           }
       }
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let sender = popularMovies[indexPath.section][indexPath.row]
+        TableViewCell.sender = popularMovies[collectionView.tag][indexPath.item]
+        let cell = collectionView.cellForItem(at: indexPath) as? CollectionViewCell
+        let storyBoard = UIStoryboard(name: "Main", bundle: nil)
+        let vc = storyBoard.instantiateViewController(identifier: "MovieDetail") as! MovieDetail
+        
+        print("I'm tapping the \(indexPath.item)")
+        print("sender : \(TableViewCell.sender)")
+        
+        self.cellDelegate?.collectionView(collectionviewcell: cell, index: indexPath.item, didTappedInTableViewCell: self)
+       
     }
-    
 
-   
-    
-    
-}
-var imageCache = NSCache<AnyObject,AnyObject>()
-extension UIImageView{
-    func load(urlString:String){
-        if let image = imageCache.object(forKey: urlString as NSString) as? UIImage{
-            self.image = image
-            return
+        func collectionView(collectionView: UICollectionView,
+            layout collectionViewLayout: UICollectionViewLayout,
+            insetForSectionAtIndex section: Int) -> UIEdgeInsets {
+            return UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         }
-        guard let url = URL(string: urlString) else {
-            return
-        }
-        DispatchQueue.global().async { [weak self] in
-            if let data = try? Data(contentsOf: url){
-                if let image = UIImage(data: data){
-                    DispatchQueue.main.async {
-                        imageCache.setObject(image, forKey: urlString as NSString)
-                        self?.image = image
-                    }
-                }
-             
-            }
-            
-        }
-    }
+
 }
-struct MovieListModell: Codable{
-    var popularMovies : [Result]?
-    var releaseDateMovies : [Result]?
-    var revenueMovies : [Result]?
-    var primaryReleaseDateMovies: [Result]?
-    var orginalTitleMovies : [Result]?
-    var voteAverageMovies:[Result]?
-    var voteCountMovies:[Result]?
-}
+
+
