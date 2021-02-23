@@ -34,13 +34,18 @@ class MovieDetail: UIViewController {
         super.viewDidLoad()
       
         movieTitle.text = movie?.title
-        let time = movie?.releaseDate ?? "00-00-0000"
+        if movie?.releaseDate != "" {
+            movieReleaseDate.text = movie?.releaseDate
+        }else{
+            movieReleaseDate.text = "00-00-0000"
+        }
+      
         let point = CGPoint(x: -15, y: 60)
         view.addSubview(cosmosView)
         cosmosView.centerInSuperview(offset: point, priority: .defaultHigh, isActive: true, usingSafeArea: true)
         
         
-        movieReleaseDate.text = time
+       
         movieOverview.text = movie?.overview
        
         if  movie?.backdropPath != nil {
