@@ -105,7 +105,7 @@ extension TableViewCell : UICollectionViewDelegate ,UICollectionViewDataSource{
           
           switch pageInt {
           case 0:
-              collectionView.scrollToItem(at: [16, 0], at: .right, animated: false)
+              collectionView.scrollToItem(at: [0, 0], at: .right, animated: false)
           case 16:
               collectionView.scrollToItem(at: [0, 0], at: .left, animated: false)
           default:

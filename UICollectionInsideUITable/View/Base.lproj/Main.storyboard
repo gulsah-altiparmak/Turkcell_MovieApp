@@ -9,7 +9,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Movie List Table-->
+        <!--Movie List-->
         <scene sceneID="VYD-AP-zlQ">
             <objects>
                 <tableViewController storyboardIdentifier="TableViewController" id="1ik-JV-QiS" customClass="MovieListTable" customModule="UICollectionInsideUITable" customModuleProvider="target" sceneMemberID="viewController">
@@ -118,7 +118,7 @@
                             <outlet property="delegate" destination="1ik-JV-QiS" id="zHw-Yh-cE8"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" id="ugn-7J-CiQ"/>
+                    <navigationItem key="navigationItem" title="Movie List" id="ugn-7J-CiQ"/>
                     <connections>
                         <segue destination="9J9-f8-cb1" kind="show" identifier="gotoMovie" id="oAm-rb-MK0"/>
                     </connections>
