@@ -1,4 +1,4 @@
 # Turkcell_MovieApp
-<video width="320" height="240" controls>
-  <source src="/Users/gulsahaltiparmak/Desktop/Gülşah Altıparmak Turkcell Movie App.mov" type="video/mp4">
-</video>
+https://user-images.githubusercontent.com/42993752/110215853-fd169880-7ebc-11eb-9d87-65b4e62fe00d.mov
+
+
